@@ -28,33 +28,6 @@ public class AssemblyStatus {
     components.remove(component);
   }
 
-  //GETTERS
-  public String getStatus() {
-    return status;
-  }
-
-  public List<Component> getComponents() {
-    return components;
-  }
-
-  public String getAssemblyId() {
-    return assemblyId;
-  }
-
-  //SETTERS
-
-  public void setStatus(String status) {
-    this.status = status;
-  }
-
-  public void setComponents(List<Component> components) {
-    this.components = components;
-  }
-
-  public void setAssemblyId(String assemblyId) {
-    this.assemblyId = assemblyId;
-  }
-
   // Verificamos si el ensamblaje está completo y devolvemos un valor booleano en funcion de si el número de componentes es mayor o igual al esperado
   public boolean isComplete(int expectedComponents) {
     return components.size() >= expectedComponents;
@@ -64,4 +37,8 @@ public class AssemblyStatus {
   public String toString() {
     return "AssemblyStatus [assemblyId=" + assemblyId + ", status=" + status + ", components=" + components + "]";
   }
+
+    public void clearComponents() {
+        components.clear();
+    }
 }

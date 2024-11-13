@@ -14,18 +14,27 @@ public class AssemblyService {
 
     private static final Logger logger = LoggerFactory.getLogger(AssemblyService.class);
     private final AssemblyStatus assemblyStatus;
+    private final int requiredComponents;
 
     public AssemblyService() {
         this.assemblyStatus = new AssemblyStatus("assembly-1");
+        this.requiredComponents = 5;
     }
 
     @RabbitListener(queues = RabbitConfig.ASSEMBLY_QUEUE_NAME)
     public void receiveComponent(Component component) {
         assemblyStatus.addComponent(component);
-        if (assemblyStatus.isComplete(5)) {
+        if (assemblyStatus.isComplete(requiredComponents)) {
             assemblyStatus.setStatus("Completado");
             logger.info("Ensamblaje completo: {}", assemblyStatus);
+            resetAssemblyStatus();
         }
         logger.info("Ensamblaje de componente: {}", assemblyStatus); 
+    }
+
+    private void resetAssemblyStatus() {
+        logger.info("Reiniciando el estado del ensamblaje para una nueva produccion");
+        this.assemblyStatus.clearComponents();
+        this.assemblyStatus.setStatus("En proceso");
     }
 }
