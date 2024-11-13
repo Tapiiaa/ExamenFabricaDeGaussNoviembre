@@ -27,6 +27,13 @@
 
 
     <dependencies>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
         <!-- Spring AMQP and RabbitMQ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -81,4 +88,3 @@
         </plugins>
     </build>
 </project>
-

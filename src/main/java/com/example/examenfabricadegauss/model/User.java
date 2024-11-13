@@ -1,7 +1,5 @@
 package com.example.examenfabricadegauss.model;
 
-import jakarta.persistence.Entity;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
