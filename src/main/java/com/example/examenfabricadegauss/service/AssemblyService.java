@@ -31,8 +31,7 @@ public class AssemblyService {
 
         if (assemblyStatus.isComplete(requiredComponents)) {
             assemblyStatus.setStatus("Completado");
-            logger.info("Ensamblaje completo: {}", assemblyStatus);
-            resetAssemblyStatus();
+            onAssemblyComplete();
         } else {
             logger.info("Componente agregado: {}. Ensamblaje de componente: {}", component, assemblyStatus);
         }
@@ -42,5 +41,11 @@ public class AssemblyService {
         logger.info("Reiniciando el estado del ensamblaje para una nueva produccion");
         this.assemblyStatus.clearComponents();
         this.assemblyStatus.setStatus("En proceso");
+    }
+
+    private void onAssemblyComplete() {
+        logger.info("Ensamblaje completo: {}", assemblyStatus);
+        logger.info("Reiniciando el estado del ensamblaje para una nueva produccion");
+        resetAssemblyStatus();
     }
 }
