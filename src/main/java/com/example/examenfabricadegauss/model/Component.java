@@ -19,4 +19,9 @@ public class Component {
     this.type = type;
     this.timestamp = LocalDateTime.now();
   }
+
+  @Override
+  public String toString() {
+    return "Component [id=" + id + ", type=" + type + ", timestamp=" + timestamp + "]";
+  }
 }

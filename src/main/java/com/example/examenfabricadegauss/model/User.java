@@ -1,9 +1,9 @@
 package com.example.examenfabricadegauss.model;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class User {
@@ -46,5 +46,11 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    // Método toString para facilitar la impresión de objetos User
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", name=" + name + ", email=" + email + "]";
     }
 }
