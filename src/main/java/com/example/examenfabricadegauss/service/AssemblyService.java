@@ -23,13 +23,19 @@ public class AssemblyService {
 
     @RabbitListener(queues = RabbitConfig.ASSEMBLY_QUEUE_NAME)
     public void receiveComponent(Component component) {
+        if (component == null) {
+            logger.error("El componente recibido es nulo, ignorando...");
+            return;
+        }
         assemblyStatus.addComponent(component);
+
         if (assemblyStatus.isComplete(requiredComponents)) {
             assemblyStatus.setStatus("Completado");
             logger.info("Ensamblaje completo: {}", assemblyStatus);
             resetAssemblyStatus();
+        } else {
+            logger.info("Componente agregado: {}. Ensamblaje de componente: {}", component, assemblyStatus);
         }
-        logger.info("Ensamblaje de componente: {}", assemblyStatus); 
     }
 
     private void resetAssemblyStatus() {
