@@ -1,5 +1,10 @@
 package com.example.examenfabricadegauss.util;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ScheduledTask implements Comparable<ScheduledTask> {
     private String componentType;
     private int priority;
