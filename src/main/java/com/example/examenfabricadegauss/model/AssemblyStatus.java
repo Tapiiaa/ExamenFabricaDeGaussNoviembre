@@ -1,5 +1,6 @@
 package com.example.examenfabricadegauss.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class AssemblyStatus {
   public AssemblyStatus(String assemblyId) {
     this.assemblyId = assemblyId;
     this.status = "Pending";
-    this.components = components;
+    this.components = new ArrayList<>();
   }
   
   public void addComponent(Component component) {
@@ -25,6 +26,33 @@ public class AssemblyStatus {
 
   public void removeComponent(Component component) {
     components.remove(component);
+  }
+
+  //GETTERS
+  public String getStatus() {
+    return status;
+  }
+
+  public List<Component> getComponents() {
+    return components;
+  }
+
+  public String getAssemblyId() {
+    return assemblyId;
+  }
+
+  //SETTERS
+
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  public void setComponents(List<Component> components) {
+    this.components = components;
+  }
+
+  public void setAssemblyId(String assemblyId) {
+    this.assemblyId = assemblyId;
   }
 
   // Verificamos si el ensamblaje está completo y devolvemos un valor booleano en funcion de si el número de componentes es mayor o igual al esperado
