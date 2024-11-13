@@ -18,12 +18,13 @@ public class AdvancedProductionService {
     }
 
     public void handleProductionRequest(String componentType, int priority) {
-        if (componentType == null || componentType.isEmpty()) {
-            throw new IllegalArgumentException("El tipo de componente no puede ser nulo o vacío");
-        } else if (priority < 1 || priority > 10) {
-            throw new IllegalArgumentException("La prioridad debe estar entre 1 y 10");
+        try {
+            validateRequest(componentType, priority);
+            scheduler.scheduleTask(new ScheduledTask(componentType, priority));
+        } catch (Exception e) {
+            logger.error("Error al programar la producción del componente: {}", componentType, e);
+            handleRetry(new ScheduledTask(componentType, priority), 0);
         }
-        scheduler.scheduleTask(new ScheduledTask(componentType, priority));
     }
 
     private void handleRetry(ScheduledTask task, int retryCount) {
@@ -38,6 +39,14 @@ public class AdvancedProductionService {
             }
         } else {
             logger.error("Se ha excedido el número máximo de reintentos para el componente: {}", task.getComponentType());
+        }
+    }
+
+    private void validateRequest(String componentType, int priority){
+        if (componentType == null || componentType.isEmpty()) {
+            throw new IllegalArgumentException("El tipo de componente no puede ser nulo o vacío");
+        } else if (priority < 1 || priority > 10) {
+            throw new IllegalArgumentException("La prioridad debe estar entre 1 y 10");
         }
     }
 }
