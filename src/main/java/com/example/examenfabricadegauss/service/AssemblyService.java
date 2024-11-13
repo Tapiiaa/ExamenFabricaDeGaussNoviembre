@@ -1,20 +1,15 @@
 package com.example.examenfabricadegauss.service;
 
+import com.example.examenfabricadegauss.config.RabbitConfig;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AssemblyService {
 
-    public void assembleMachine() {
-        // Lógica para ensamblar la máquina a partir de componentes disponibles
-        System.out.println("Assembling machine from available components.");
-    }
-
-    public void addComponentToAssemblyQueue(String componentId) {
-        System.out.println("Añadiendo componente: " + componentId);
-    }
-
-    public void assembleComponents(){
-        System.out.println("Ensamblaje de componentes en una máquina");
+    @RabbitListener(queues = RabbitConfig.ASSEMBLY_QUEUE_NAME)
+    public void receiveComponent(String componentType) {
+        System.out.println("Ensamblaje de componente: " + componentType);
+        // Añadir aquí la lógica de ensamblaje
     }
 }
