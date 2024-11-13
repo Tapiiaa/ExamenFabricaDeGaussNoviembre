@@ -28,21 +28,17 @@
 
     <dependencies>
 
+
         <dependency>
             <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>        
+            <artifactId>reactor-core</artifactId>
+            <version>3.7.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0.2</version>
         </dependency>
 
         <!-- Spring AMQP and RabbitMQ -->
