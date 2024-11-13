@@ -37,7 +37,7 @@ public class AssemblyService {
         }
     }
 
-    private void resetAssemblyStatus() {
+    protected void resetAssemblyStatus() {
         logger.info("Reiniciando el estado del ensamblaje para una nueva produccion");
         this.assemblyStatus.clearComponents();
         this.assemblyStatus.setStatus("En proceso");
@@ -48,4 +48,9 @@ public class AssemblyService {
         logger.info("Reiniciando el estado del ensamblaje para una nueva produccion");
         resetAssemblyStatus();
     }
+
+    public AssemblyStatus getAssemblyStatus() {
+        return assemblyStatus;
+    }
+
 }
