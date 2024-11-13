@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 public class ProductionService {
 
     public void receiveMessage(String message) {
-        System.out.println("Received <" + message + ">");
+        System.out.println("Recibido <" + message + ">");
         // Procesar el mensaje recibido, transformarlo en componentes, etc.
     }
 
     //Patrik, completar si ves necesario:
     private void processMessage(String message) {
-        System.out.println("Processing message: " + message); //Esto como me comentaste, procesamos la señal como msj.
+        System.out.println("Procesando mensaje: " + message); //Esto como me comentaste, procesamos la señal como msj.
     }
 }

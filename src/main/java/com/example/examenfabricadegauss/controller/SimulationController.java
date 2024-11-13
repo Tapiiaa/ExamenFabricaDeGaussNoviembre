@@ -1,28 +1,34 @@
 package com.example.examenfabricadegauss.controller;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.example.examenfabricadegauss.service.ProductionService;
+import com.example.examenfabricadegauss.service.AssemblyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.examenfabricadegauss.config.RabbitConfig;
-
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/simulate")
 public class SimulationController {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final ProductionService productionService;
+    private final AssemblyService assemblyService;
 
     @Autowired
-    public SimulationController(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    public SimulationController(ProductionService productionService, AssemblyService assemblyService) {
+        this.productionService = productionService;
+        this.assemblyService = assemblyService;
     }
 
-    @GetMapping("/send")
-    public String send(@RequestParam("msg") String message) {
-        rabbitTemplate.convertAndSend(RabbitConfig.queueName, message);
-        return "Message sent to the queue: " + message;
+    @GetMapping("/produce")
+    public String simulateProduction() {
+        productionService.receiveMessage("Simular mensaje de producción");
+        return "Simulación de producción iniciada";
+    }
+
+    @GetMapping("/assemble")
+    public String simulateAssembly() {
+        assemblyService.assembleComponents();
+        return "Simulación de ensamblaje iniciada";
     }
 }
