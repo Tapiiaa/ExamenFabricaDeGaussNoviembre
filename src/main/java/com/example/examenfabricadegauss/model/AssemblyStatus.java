@@ -24,10 +24,6 @@ public class AssemblyStatus {
     components.add(component);
   }
 
-  public void removeComponent(Component component) {
-    components.remove(component);
-  }
-
   // Verificamos si el ensamblaje está completo y devolvemos un valor booleano en funcion de si el número de componentes es mayor o igual al esperado
   public boolean isComplete(int expectedComponents) {
     return components.size() >= expectedComponents;
