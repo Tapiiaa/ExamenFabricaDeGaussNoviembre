@@ -12,12 +12,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/topic");    // Configura un broker para enviar mensajes a los clientes en el prefijo /topic
+        config.setApplicationDestinationPrefixes("/app");   // Configura un prefijo para los mensajes enviados desde los clientes
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Registra un punto final para el cliente WebSocket con soporte de fallback de SockJS
         registry.addEndpoint("/gauss-websocket").withSockJS();
     }
 
