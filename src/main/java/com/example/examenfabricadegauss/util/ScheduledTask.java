@@ -1,44 +1,78 @@
 package com.example.examenfabricadegauss.util;
 
-import com.example.examenfabricadegauss.model.Component;
 import com.example.examenfabricadegauss.service.ProductionService;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Getter
-@Setter
-public class ScheduledTask implements Comparable<ScheduledTask> {
-
+public class ScheduledTask implements Comparable<ScheduledTask>, Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
-    private String componentType;
-    private int priority;
-    private final ProductionService productionService;
 
-    public ScheduledTask(String componentType, int priority, ProductionService productionService) {
-        this.componentType = componentType;
+    private final Runnable task; // Asegúrate de que este sea de tipo Runnable (una interfaz funcional)
+    private final String description;
+    private final int priority;
+    private final ProductionService service;
+    private final long scheduledTime;
+
+    public ScheduledTask(Runnable task, String description, int priority, ProductionService service, long scheduledTime) {
+        this.task = task;
+        this.description = description;
         this.priority = priority;
-        this.productionService = productionService;
-    }
-
-    public String getTaskDetails() {
-        return "Componente: " + componentType + ", Prioridad: " + priority;
+        this.service = service;
+        this.scheduledTime = scheduledTime;
     }
 
     @Override
-    public int compareTo(ScheduledTask o) {
-        return Integer.compare(this.priority, o.priority);
+    public void run() {
+        // Ejecuta la tarea asociada
+        if (task != null) {
+            logger.info("Ejecutando tarea: {}", description);
+            try {
+                task.run();
+                logger.info("Tarea completada con éxito: {}", description);
+            } catch (Exception e) {
+                logger.error("Error al ejecutar la tarea: {}", description, e);
+            }
+        }
     }
 
-    public void execute() {
-        try {
-            productionService.produceComponent(componentType);
-            Thread.sleep(1000);
-            logger.info("Componente de tipo: {} producido y enviado a la cola", componentType);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("Tarea interrumpida", e);
+    @Override
+    public int compareTo(ScheduledTask other) {
+        // Primero, comparo por prioridad
+        int priorityComparison = Integer.compare(this.priority, other.priority);
+        if (priorityComparison != 0) {
+            return priorityComparison;
         }
+
+        // Si la prioridad es la misma, comparo por tiempo de programación
+        return Long.compare(this.scheduledTime, other.scheduledTime);
+    }
+
+    // Métodos getter si son necesarios
+    public String getDescription() {
+        return description;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public ProductionService getService() {
+        return service;
+    }
+
+    public long getScheduledTime() {
+        return scheduledTime;
+    }
+
+    // Nuevo método: getTaskDetails
+    public String getTaskDetails() {
+        return String.format("Descripción: %s, Prioridad: %d, Programada para: %d", description, priority, scheduledTime);
+    }
+
+    // Nuevo método: execute
+    public void execute() {
+        // Ejecuta la tarea
+        logger.info("Ejecutando la lógica de la tarea desde el método execute: {}", description);
+        run(); // Llama al método run() que contiene la lógica de la tarea
     }
 }

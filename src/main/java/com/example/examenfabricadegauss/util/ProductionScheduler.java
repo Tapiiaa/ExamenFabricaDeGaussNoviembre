@@ -31,21 +31,22 @@ public class ProductionScheduler {
     }
 
     @PostConstruct
-    private void startTaskProccesing() {
+    private void startTaskProcessing() {
         taskExecutor.execute(() -> {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {  // Verifica si el hilo ha sido interrumpido
                 try {
-                    ScheduledTask task = queue.take();
+                    ScheduledTask task = queue.take();  // Espera a que haya una tarea disponible en la cola
                     taskExecutor.execute(() -> processTask(task));
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    logger.error("Error al procesar la tarea", e);
+                    Thread.currentThread().interrupt();  // Restaurar el estado de interrupción del hilo
+                    logger.error("El hilo fue interrumpido mientras esperaba la siguiente tarea. Finalizando la ejecución.", e);
+                    break;  // Salir del bucle si el hilo es interrumpido
                 }
             }
         });
     }
 
-    private void processTask(ScheduledTask task){
+    private void processTask(ScheduledTask task) {
         int attempt = 0;
         boolean success = false;
 
@@ -56,18 +57,20 @@ public class ProductionScheduler {
                 success = true;
                 logger.info("Tarea completada: {}", task.getTaskDetails());
             } catch (Exception e) {
-                attempt ++;
+                attempt++;
                 logger.error("Error al procesar la tarea: {}", task.getTaskDetails(), e);
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException interruptedException) {
-                    Thread.currentThread().interrupt();
-                    logger.error("Error al dormir el hilo", interruptedException);
+                    Thread.currentThread().interrupt();  // Restaurar el estado de interrupción
+                    logger.error("Error al dormir el hilo durante el intento de reintento", interruptedException);
+                    break;  // Salir del bucle de reintento si el hilo es interrumpido
                 }
             }
         }
+
         if (!success) {
-            logger.error("Fallo al ejecutar la tarea despues de 3 intententos: {}", task.getTaskDetails());
+            logger.error("Fallo al ejecutar la tarea después de 3 intentos: {}", task.getTaskDetails());
         }
     }
 }
