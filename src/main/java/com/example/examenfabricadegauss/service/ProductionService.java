@@ -29,6 +29,7 @@ public class ProductionService {
             } catch (AmqpException e) {
                 logger.error("Error en la producción del componente: {}", e.getMessage());
                 handleRetry(type, 0);
+                throw new RuntimeException("Error al producir componente");
             }
         });
     }
