@@ -1,26 +1,18 @@
-<!-- Archivo: index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gauss Production Simulation</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Simulación de Campana de Gauss</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="container">
-    <h1>Simulación de Producción - Campanas de Gauss</h1>
-    <div id="chart-container">
-        <!-- Gráfico generado por JavaScript -->
-        <canvas id="gaussChart"></canvas>
-    </div>
-    <div class="controls">
-        <button id="startSimulation">Iniciar Simulación</button>
-        <button id="pauseSimulation">Pausar</button>
-        <button id="resetSimulation">Reiniciar</button>
-    </div>
+    <h1>Simulación de Producción Concurrente: Fábrica de Campanas de Gauss</h1>
+    <button id="startSimulation">Iniciar Simulación</button>
+    <canvas id="gaussianChart" width="800" height="400"></canvas>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="script.js"></script>
+<script src="/static/app.js"></script>
 </body>
 </html>

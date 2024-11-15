@@ -1,42 +1,21 @@
-/* Archivo: styles.css */
 body {
     font-family: Arial, sans-serif;
+    text-align: center;
     background-color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
+    padding: 20px;
 }
 
 .container {
-    text-align: center;
-    background: white;
+    background-color: white;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-#chart-container {
-    width: 600px;
-    height: 400px;
-    margin: auto;
-}
-
-.controls {
-    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
 button {
-    margin: 5px;
     padding: 10px 20px;
-    border: none;
-    background: #007bff;
-    color: white;
-    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 20px;
     cursor: pointer;
-}
-
-button:hover {
-    background: #0056b3;
 }

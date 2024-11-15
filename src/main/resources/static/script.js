@@ -1,21 +1,25 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const startSimulationButton = document.getElementById('startSimulation');
+    const ctx = document.getElementById('gaussianChart').getContext('2d');
+    let chartData = {
+        labels: [],
+        datasets: [{
+            label: 'Distribución Gaussiana',
+            data: [],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
 
-/* Archivo: script.js */
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('gaussChart').getContext('2d');
-    const gaussChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: Array.from({ length: 20 }, (_, i) => `Contenedor ${i + 1}`),
-            datasets: [{
-                label: 'Cantidad de Bolas',
-                data: Array.from({ length: 20 }, () => 0),
-                backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                borderColor: 'rgba(0, 123, 255, 1)',
-                borderWidth: 1
-            }]
-        },
+    const gaussianChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
         options: {
             scales: {
+                x: {
+                    beginAtZero: true
+                },
                 y: {
                     beginAtZero: true
                 }
@@ -23,31 +27,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    let intervalId;
-    let data = gaussChart.data.datasets[0].data;
+    function connectWebSocket() {
+        const socket = new SockJS('/gs-guide-websocket');
+        const stompClient = Stomp.over(socket);
 
-    function updateChart() {
-        // Simular la caída de una bola a un contenedor aleatorio
-        const index = Math.floor(Math.random() * data.length);
-        data[index] += 1;
-        gaussChart.update();
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/gaussian-distribution', function (message) {
+                const value = parseFloat(message.body);
+                updateChart(value);
+            });
+        });
     }
 
-    document.getElementById('startSimulation').addEventListener('click', function() {
-        if (!intervalId) {
-            intervalId = setInterval(updateChart, 500);
-        }
-    });
+    function updateChart(value) {
+        chartData.labels.push(chartData.labels.length + 1);
+        chartData.datasets[0].data.push(value);
+        gaussianChart.update();
+    }
 
-    document.getElementById('pauseSimulation').addEventListener('click', function() {
-        clearInterval(intervalId);
-        intervalId = null;
-    });
-
-    document.getElementById('resetSimulation').addEventListener('click', function() {
-        clearInterval(intervalId);
-        intervalId = null;
-        data.fill(0);
-        gaussChart.update();
+    startSimulationButton.addEventListener('click', function () {
+        connectWebSocket();
+        fetch('/simulate', { method: 'POST' }) // Envía una solicitud POST para iniciar la simulación
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Error al iniciar la simulación');
+                }
+            });
     });
 });
