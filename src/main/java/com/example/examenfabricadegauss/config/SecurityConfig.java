@@ -28,12 +28,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in testing. Not recommended for production.
+                .csrf(csrf -> csrf.disable()) // Desactiva CSRF para simplificar el desarrollo
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**", "/home").permitAll() // Allow public routes without authentication
-                        .anyRequest().authenticated() // All other requests require authentication
+                        .requestMatchers("/public/**", "/home", "/index.html", "/static/**").permitAll() // Permite acceso sin autenticación a estas rutas
+                        .anyRequest().authenticated() // Todas las demás requieren autenticación
                 )
-                .httpBasic(withDefaults()); // Use basic authentication for simplicity
+                .formLogin(login -> login.permitAll()) // Permite el uso del formulario de login predeterminado
+                .logout(logout -> logout.permitAll()); // Permite la salida de la sesión
 
         return http.build();
     }

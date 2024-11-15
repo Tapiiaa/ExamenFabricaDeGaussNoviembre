@@ -1,14 +1,15 @@
 package com.example.examenfabricadegauss.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "Bienvenido a la Aplicación de Examen Fábrica de Gauss";
+        return "index.html";  // Esto redirige a index.html en la carpeta static
     }
 }
+
 
