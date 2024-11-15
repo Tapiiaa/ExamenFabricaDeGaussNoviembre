@@ -1,5 +1,6 @@
 package com.example.examenfabricadegauss.config;
 
+
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -27,19 +28,19 @@ public class RabbitConfig {
     public static final String PRODUCTION_ROUTING_KEY = "production.routing.key";
     public static final String ASSEMBLY_ROUTING_KEY = "assembly.routing.key";
 
-    @Value("${spring.rabbitmq.queue.production}")
+    @Value("${spring.rabbitmq.queue.production:productionQueue}")
     private String productionQueueName;
 
-    @Value("${rabbitmq.queue.assembly}")
+    @Value("${rabbitmq.queue.assembly:assemblyQueue}")
     private String assemblyQueueName;
 
-    @Value("${spring.application.name}")
+    @Value("${spring.application.name:ExamenFabricaDeGauss2}")
     private String exchangeName;
 
-    @Value("${rabbitmq.routing.production}")
+    @Value("${rabbitmq.routing.production:production.routing.key}")
     private String productionRoutingKey;
 
-    @Value("${rabbitmq.routing.assembly}")
+    @Value("${rabbitmq.routing.assembly:assembly.routing.key}")
     private String assemblyRoutingKey;
 
     @Bean
@@ -51,7 +52,7 @@ public class RabbitConfig {
     public Queue productionQueue() {
         return new Queue(productionQueueName, true); // true para cola persistente
     }
-  
+
     @Bean
     public Queue assemblyQueue() {
         return new Queue(assemblyQueueName, true);
@@ -62,18 +63,15 @@ public class RabbitConfig {
         return BindingBuilder.bind(productionQueue).to(exchange).with(productionRoutingKey);
     }
 
-    
     @Bean
     public Binding assemblyBinding(TopicExchange exchange, Queue assemblyQueue) {
         return BindingBuilder.bind(assemblyQueue).to(exchange).with(assemblyRoutingKey);
     }
 
-    
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
-
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
@@ -82,7 +80,6 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
-    
     @Bean
     public MessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory,
                                                              MessageListenerAdapter listenerAdapter) {
@@ -93,7 +90,6 @@ public class RabbitConfig {
         return container;
     }
 
-  
     @Bean
     public MessageListenerAdapter messageListenerAdapter(AssemblyService assemblyService) {
         return new MessageListenerAdapter(assemblyService, "receiveComponent");
