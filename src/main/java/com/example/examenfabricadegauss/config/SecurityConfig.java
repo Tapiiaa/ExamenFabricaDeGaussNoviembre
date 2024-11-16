@@ -33,17 +33,18 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Desactiva CSRF para simplificar el desarrollo
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/**, /public/**", "/home", "/index.html", "/static/**").permitAll() // Permite acceso sin autenticación a estas rutas
+                        .requestMatchers("/h2-console/**", "/login.html", "/register.html", "/index.html", "/static/**").permitAll()
                         .anyRequest().authenticated() // Todas las demás requieren autenticación
                 )
+                .headers(AbstractHttpConfigurer::disable)    // Permite cargar h2 console
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("home", true)
+                        .defaultSuccessUrl("/home", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("login")
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 );
         return http.build();

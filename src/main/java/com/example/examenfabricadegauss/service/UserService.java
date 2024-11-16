@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class UserService implements UserDetailsService {
         if (name == null || name.isEmpty() || email == null || email.isEmpty() || password == null || password.isEmpty()) {
             throw new IllegalArgumentException("Los datos solicitados no pueden ser nulos o vacios");
         }
-        AppUser newUser = new AppUser(name, email, password);
+        AppUser newUser = new AppUser(name, email, passwordEncoder.encode(password));
         return userRepository.save(newUser);
     }
 
