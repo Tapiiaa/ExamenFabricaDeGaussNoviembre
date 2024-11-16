@@ -30,12 +30,19 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Desactiva CSRF para simplificar el desarrollo
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**", "/home", "/index.html", "/static/**").permitAll() // Permite acceso sin autenticación a estas rutas
+                        .requestMatchers("/login/**, /public/**", "/home", "/index.html", "/static/**").permitAll() // Permite acceso sin autenticación a estas rutas
                         .anyRequest().authenticated() // Todas las demás requieren autenticación
                 )
-                .formLogin(login -> login.permitAll()) // Permite el uso del formulario de login predeterminado
-                .logout(logout -> logout.permitAll()); // Permite la salida de la sesión
-
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("home", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("login")
+                        .permitAll()
+                );
         return http.build();
     }
 
