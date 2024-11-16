@@ -1,26 +1,23 @@
 package com.example.examenfabricadegauss.config;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.concurrent.DelegatingSecurityContextExecutorService;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
@@ -28,7 +25,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desactiva CSRF para simplificar el desarrollo
+                .csrf(AbstractHttpConfigurer::disable) // Desactiva CSRF para simplificar el desarrollo
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/**, /public/**", "/home", "/index.html", "/static/**").permitAll() // Permite acceso sin autenticación a estas rutas
                         .anyRequest().authenticated() // Todas las demás requieren autenticación
@@ -58,9 +55,7 @@ public class SecurityConfig {
         taskExecutor.setMaxPoolSize(20);
         taskExecutor.setQueueCapacity(50);
         taskExecutor.setThreadNamePrefix("GaussTask-");
-        taskExecutor.setRejectedExecutionHandler((runnable, executor) -> {
-            logger.warn("Task {} rejected from {}", runnable.toString(), executor.toString());
-        });
+        taskExecutor.setRejectedExecutionHandler((runnable, executor) -> logger.warn("Tarea {} rechazada de {}", runnable.toString(), executor.toString()));
         taskExecutor.initialize();
 
         ThreadPoolExecutor executor = taskExecutor.getThreadPoolExecutor();
@@ -79,7 +74,7 @@ public class SecurityConfig {
     private void logThreadPoolStats(ThreadPoolExecutor executor) {
         new Thread(() -> {
             while (true) {
-                logger.info("Active Threads: {} | Pool Size: {} | Core Pool Size: {} | Maximum Pool Size: {} | Completed Tasks: {} | Task Count: {}",
+                logger.info("Hilos activos: {} | tamaño de la piscina: {} | Tamaño del grupo central: {} | tamaño máximo de la piscina: {} | Tareas completadas: {} | Recuento de tareas: {}",
                         executor.getActiveCount(),
                         executor.getPoolSize(),
                         executor.getCorePoolSize(),
@@ -87,7 +82,7 @@ public class SecurityConfig {
                         executor.getCompletedTaskCount(),
                         executor.getTaskCount());
                 try {
-                    Thread.sleep(5000); // Log every 5 seconds
+                    Thread.sleep(5000); // Muestra un log cada 5 segundos
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
