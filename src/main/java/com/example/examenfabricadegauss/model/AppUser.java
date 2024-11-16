@@ -2,7 +2,11 @@ package com.example.examenfabricadegauss.model;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "app_user")
 public class AppUser {
@@ -12,40 +16,17 @@ public class AppUser {
     private String name;
     private String email;
     private String username;
+    private String password;
 
     // Constructor vacío necesario para JPA
     public AppUser() {
     }
 
     // Constructor para facilitar la creación de instancias
-    public AppUser(String name, String email) {
+    public AppUser(String name, String email, String password) {
         this.name = name;
         this.email = email;
-    }
-
-    // Getters y setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+        this.password = password;
     }
 
     // Método toString para facilitar la impresión de objetos User
