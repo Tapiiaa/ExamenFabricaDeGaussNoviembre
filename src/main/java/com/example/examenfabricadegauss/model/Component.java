@@ -14,7 +14,7 @@ public class Component {
   private String type;
   private LocalDateTime timestamp;
   
-  public Component(String id, String type) {
+  public Component(String type) {
     this.id = id;
     this.type = type;
     this.timestamp = LocalDateTime.now();

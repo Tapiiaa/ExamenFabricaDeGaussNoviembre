@@ -1,7 +1,7 @@
 package com.example.examenfabricadegauss.service;
 
+import com.example.examenfabricadegauss.model.Component;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -10,8 +10,11 @@ import com.example.examenfabricadegauss.config.RabbitConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
+
 @Service
-public class ProductionService {
+public class ProductionService implements WorkStationService {
     private static final Logger logger = LoggerFactory.getLogger(ProductionService.class);
     private final RabbitTemplate rabbitTemplate;
     private final ThreadPoolTaskExecutor taskExecutor;
@@ -22,15 +25,26 @@ public class ProductionService {
         this.taskExecutor = taskExecutor;
     }
 
-    public void produceComponent(String type) {
-        taskExecutor.execute(() -> {
+    @Override
+    public CompletableFuture<Component> produceComponent(String type) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 logger.info("Produciendo componente del tipo: {}", type);
+                Thread.sleep(2000);
+
+                Component component = new Component(type);
+                component.setId("COMP-" + LocalDateTime.now());
+                component.setType(type);
+                component.setTimestamp(LocalDateTime.now());
+
+
                 rabbitTemplate.convertAndSend(RabbitConfig.PRODUCTION_QUEUE_NAME, type);
-            } catch (AmqpException e) {
-                logger.error("Error en la producción del componente: {}", e.getMessage());
-                handleRetry(type, 0);
-                throw new RuntimeException("Error al producir componente");
+                logger.info("Componente producido: {}", type);
+
+                return component;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Error al producir el componente", e);
             }
         });
     }
@@ -49,4 +63,5 @@ public class ProductionService {
             logger.error("Fallo en producir el componente del tipo: {} después de {} intentos", type, retryCount);
         }
     }
+
 }

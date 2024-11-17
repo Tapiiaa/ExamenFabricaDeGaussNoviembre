@@ -7,5 +7,5 @@ import java.util.concurrent.CompletableFuture;
 
 public interface WorkStationService {
 
-  CompletableFuture<Component> produceComponent(); // Produce un componente de la maquina.
+  CompletableFuture<Component> produceComponent(String type); // Produce un componente de la maquina.
 }
