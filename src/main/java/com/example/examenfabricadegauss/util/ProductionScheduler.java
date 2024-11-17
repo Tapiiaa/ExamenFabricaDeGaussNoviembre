@@ -1,7 +1,9 @@
 package com.example.examenfabricadegauss.util;
 
+import com.example.examenfabricadegauss.config.RabbitConfig;
 import com.example.examenfabricadegauss.service.WorkStationService;
 import jakarta.annotation.PostConstruct;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -9,9 +11,9 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class ProductionScheduler {
@@ -20,11 +22,13 @@ public class ProductionScheduler {
     private final PriorityBlockingQueue<ScheduledTask> queue = new PriorityBlockingQueue<>();
     private final ThreadPoolTaskExecutor taskExecutor;
     private final WorkStationService workStation;
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public ProductionScheduler(@Qualifier("customTaskExecutor") ThreadPoolTaskExecutor taskExecutor, WorkStationService workStation) {
+    public ProductionScheduler(@Qualifier("customTaskExecutor") ThreadPoolTaskExecutor taskExecutor, WorkStationService workStation, RabbitTemplate rabbitTemplate) {
         this.taskExecutor = taskExecutor;
         this.workStation = workStation;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public void scheduleTask(ScheduledTask task ) {
@@ -75,29 +79,53 @@ public class ProductionScheduler {
 
     private void processTask(ScheduledTask task, WorkStationService station) {
         int attempt = 0;
-        boolean success = false;
+        AtomicBoolean success = new AtomicBoolean(false);
 
-        while (attempt < 3 && !success) {
+        while (attempt < 3 && !success.get()) {
             try {
-                logger.info("Ejecutando tarea: {} en la estacion: {}", task.getTaskDetails(), station.getClass().getSimpleName());
+                logger.info("Ejecutando tarea: {} en la estación: {}", task.getTaskDetails(), station.getClass().getSimpleName());
+
                 station.produceComponent(task.getTaskDetails())
-                                .thenAccept(component -> logger.info("Componente producido: {}", component));
-                success = true;
-                logger.info("Tarea completada: {}", task.getTaskDetails());
-            } catch (Exception e) {
-                attempt++;
-                logger.error("Error al procesar la tarea: {}", task.getTaskDetails(), e);
+                        .thenAccept(component -> {
+                            logger.info("Componente producido: {}", component);
+
+                            // Enviar mensaje a RabbitMQ
+                            try {
+                                rabbitTemplate.convertAndSend(RabbitConfig.PRODUCTION_QUEUE_NAME, component);
+                                logger.info("Mensaje enviado a RabbitMQ: {}", component);
+                                success.set(true); // Marca la tarea como exitosa si RabbitMQ no falla
+                            } catch (Exception e) {
+                                logger.error("Error al enviar el componente a RabbitMQ: {}", component, e);
+                            }
+                        })
+                        .exceptionally(e -> {
+                            logger.error("Error al producir el componente: {}", task.getTaskDetails(), e);
+                            return null;
+                        });
+
+                // Pausa breve para permitir el procesamiento del CompletableFuture
+                Thread.sleep(2000);
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restaurar el estado de interrupción
+                logger.error("El hilo fue interrumpido durante la ejecución de la tarea: {}", task.getTaskDetails(), e);
+                break; // Salir del bucle si el hilo fue interrumpido
+            }
+
+            attempt++;
+            if (!success.get()) {
+                logger.info("Reintentando la tarea: {} (Intento {})", task.getTaskDetails(), attempt);
                 try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException interruptedException) {
-                    Thread.currentThread().interrupt();  // Restaurar el estado de interrupción
-                    logger.error("Error al dormir el hilo durante el intento de reintento", interruptedException);
-                    break;  // Salir del bucle de reintento si el hilo es interrumpido
+                    Thread.sleep(3000); // Esperar antes de reintentar
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.error("El hilo fue interrumpido durante el reintento: {}", task.getTaskDetails());
+                    break;
                 }
             }
         }
 
-        if (!success) {
+        if (!success.get()) {
             logger.error("Fallo al ejecutar la tarea después de 3 intentos: {}", task.getTaskDetails());
         }
     }
