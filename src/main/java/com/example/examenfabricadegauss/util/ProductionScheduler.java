@@ -1,6 +1,7 @@
 package com.example.examenfabricadegauss.util;
 
 import com.example.examenfabricadegauss.config.RabbitConfig;
+import com.example.examenfabricadegauss.controller.VisualizationController;
 import com.example.examenfabricadegauss.service.WorkStationService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,6 +24,9 @@ public class ProductionScheduler {
     private final ThreadPoolTaskExecutor taskExecutor;
     private final WorkStationService workStation;
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private VisualizationController visualizationController;
 
     @Autowired
     public ProductionScheduler(@Qualifier("customTaskExecutor") ThreadPoolTaskExecutor taskExecutor, WorkStationService workStation, RabbitTemplate rabbitTemplate) {
@@ -93,6 +97,8 @@ public class ProductionScheduler {
                             try {
                                 rabbitTemplate.convertAndSend(RabbitConfig.PRODUCTION_QUEUE_NAME, component);
                                 logger.info("Mensaje enviado a RabbitMQ: {}", component);
+
+                                visualizationController.sendComponentData(component);
                                 success.set(true); // Marca la tarea como exitosa si RabbitMQ no falla
                             } catch (Exception e) {
                                 logger.error("Error al enviar el componente a RabbitMQ: {}", component, e);
