@@ -41,7 +41,7 @@ public class ProductionScheduler {
         new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                     ThreadPoolExecutor executor = taskExecutor.getThreadPoolExecutor();
                     logger.info("Hilos activos: {} | Tamaño del pool: {} | Tareas completadas: {} | Tareas en cola: {}",
                             executor.getActiveCount(),

@@ -3,6 +3,8 @@ package com.example.examenfabricadegauss.controller;
 import com.example.examenfabricadegauss.service.ProductionService;
 import com.example.examenfabricadegauss.util.ProductionScheduler;
 import com.example.examenfabricadegauss.util.ScheduledTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,23 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class SimulationController {
     private final ProductionScheduler scheduler;
 
+    Logger logger = LoggerFactory.getLogger(SimulationController.class);
     @Autowired
     public SimulationController(ProductionScheduler scheduler) {
         this.scheduler = scheduler;
     }
 
     @GetMapping("/produce")
-    public String simulateProduction(@RequestParam String type, @RequestParam int count) {
+    public String simulateProduction(@RequestParam String type, @RequestParam(defaultValue = "10") int count) {
         for (int i = 0; i < count; i++) {
             // Crear la tarea como un Runnable con lógica de producción
             Runnable taskLogic = () -> {
-                System.out.println("Produciendo componente del tipo: " + type);
                 try {
-                    Thread.sleep(1000); // Simula tiempo de producción
-                    System.out.println("Componente producido: " + type);
+                    logger.info("Produciendo componente del tipo: {}", type);
+                    Thread.sleep(2000);
+                    logger.info("Componente producido: {}", type);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    System.err.println("Error al producir el componente: " + e.getMessage());
+                    logger.error("Error al producir el componente: " + e.getMessage());
                 }
             };
 
