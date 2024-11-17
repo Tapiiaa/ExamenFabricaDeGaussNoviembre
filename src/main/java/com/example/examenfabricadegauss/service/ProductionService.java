@@ -12,12 +12,13 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 @Service
 public class ProductionService implements WorkStationService {
     private static final Logger logger = LoggerFactory.getLogger(ProductionService.class);
     private final RabbitTemplate rabbitTemplate;
-    private final ThreadPoolTaskExecutor taskExecutor;
+    private final Executor taskExecutor;
 
     @Autowired
     public ProductionService(RabbitTemplate rabbitTemplate, ThreadPoolTaskExecutor taskExecutor) {
@@ -38,7 +39,7 @@ public class ProductionService implements WorkStationService {
                 component.setTimestamp(LocalDateTime.now());
 
 
-                rabbitTemplate.convertAndSend(RabbitConfig.PRODUCTION_QUEUE_NAME, type);
+                rabbitTemplate.convertAndSend(RabbitConfig.PRODUCTION_QUEUE_NAME, component);
                 logger.info("Componente producido: {}", type);
 
                 return component;
@@ -46,7 +47,7 @@ public class ProductionService implements WorkStationService {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Error al producir el componente", e);
             }
-        });
+        }, taskExecutor);
     }
 
     private void handleRetry(String type, int retryCount) {

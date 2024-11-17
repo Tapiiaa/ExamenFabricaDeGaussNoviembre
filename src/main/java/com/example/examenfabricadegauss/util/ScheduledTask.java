@@ -10,15 +10,19 @@ public class ScheduledTask implements Comparable<ScheduledTask>, Runnable {
     private final Runnable task; // Asegúrate de que este sea de tipo Runnable (una interfaz funcional)
     private final String description;
     private final int priority;
-    private final ProductionService service;
     private final long scheduledTime;
+    private final Object associatedService;
 
-    public ScheduledTask(Runnable task, String description, int priority, ProductionService service, long scheduledTime) {
+    public ScheduledTask(Runnable task, String description, int priority, Object associatedService) {
+        this(task, description, priority, associatedService, System.currentTimeMillis());
+    }
+
+    public ScheduledTask(Runnable task, String description, int priority, Object associatedService, long scheduledTime) {
         this.task = task;
         this.description = description;
         this.priority = priority;
-        this.service = service;
         this.scheduledTime = scheduledTime;
+        this.associatedService = associatedService;
     }
 
     @Override
@@ -56,9 +60,6 @@ public class ScheduledTask implements Comparable<ScheduledTask>, Runnable {
         return priority;
     }
 
-    public ProductionService getService() {
-        return service;
-    }
 
     public long getScheduledTime() {
         return scheduledTime;
