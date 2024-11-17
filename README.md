@@ -1,3 +1,7 @@
+Link al repositorio: https://github.com/Tapiiaa/ExamenFabricaDeGaussNoviembre.git
+
+Realizado por Patrik Paul Sirbu y Pedro Alonso Tapia Lobo
+
 Simulación de Producción Concurrente con Spring Boot WebFlux y RabbitMQ en la Fábrica de Campanas de Gauss
 Descripción del Proyecto
 En un universo paralelo del año 1850, Sir Francis Galton revolucionó el mundo con su "máquina de la distribución normal". Esta máquina, inspirada en su tablero de Galton, demostraba cómo las bolas al caer a través de clavos distribuidos formaban una curva en forma de campana, conocida como distribución normal o gaussiana. Para demostrar este fenómeno, Galton fundó la fábrica "Campanas de Gauss", donde estaciones de trabajo independientes producían componentes de estas máquinas, ensamblados posteriormente en una línea de producción.
